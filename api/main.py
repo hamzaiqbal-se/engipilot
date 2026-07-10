@@ -2,8 +2,8 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from api.database import engine, Base, get_db
+from api import models   # <-- ye line zaroori hai, isse SQLAlchemy models register hote hain
 
-# Creates tables if they don't exist yet
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="EngiPilot API", version="0.1.0")
