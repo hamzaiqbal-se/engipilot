@@ -1,6 +1,10 @@
 import os
 import requests
 from dotenv import load_dotenv
+import logging
+
+logger = logging.getLogger("engipilot")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 load_dotenv()
 
@@ -53,7 +57,8 @@ def get_repo_activity_summary():
     """Combine commits + PRs into one summary — this is what the Engineering Agent will consume."""
     commits = get_recent_commits()
     prs = get_pull_requests()
-
+    logger.info(f"Fetched GitHub activity: {len(commits)} commits, {len(prs)} PRs")
+    
     return {
         "total_recent_commits": len(commits),
         "total_recent_prs": len(prs),

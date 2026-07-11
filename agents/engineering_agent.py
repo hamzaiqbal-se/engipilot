@@ -2,6 +2,10 @@ from sqlalchemy.orm import Session
 from api import models
 from api.github_client import get_repo_activity_summary
 from datetime import datetime, timedelta
+import logging
+
+logger = logging.getLogger("engipilot")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 
 INACTIVITY_THRESHOLD_DAYS = 7
@@ -53,6 +57,8 @@ def run_engineering_agent(project_id: int, db: Session) -> dict:
             is_inactive = True  # no commits at all
     except Exception as e:
         github_activity = {"error": str(e)}
+        
+    logger.info(f"Engineering Agent run for project_id={project_id}: progress={progress_percentage}%, blocked={len(blocked_tasks)}, inactive={is_inactive}")
 
     # --- Final output matching engineering_data schema field ---
     return {
