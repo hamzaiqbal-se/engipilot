@@ -5,6 +5,8 @@ from api.database import engine, Base, get_db
 from api import models
 from api.routers import projects, sprints, tasks
 from api.github_client import get_repo_activity_summary
+from agents.engineering_agent import run_engineering_agent
+from api.database import SessionLocal
 
 Base.metadata.create_all(bind=engine)
 
@@ -29,3 +31,12 @@ def check_db_connection(db: Session = Depends(get_db)):
 @app.get("/github/activity")
 def github_activity():
     return get_repo_activity_summary()
+
+@app.get("/agents/engineering/{project_id}")
+def engineering_agent_endpoint(project_id: int):
+    db = SessionLocal()
+    try:
+        result = run_engineering_agent(project_id, db)
+        return result
+    finally:
+        db.close()
