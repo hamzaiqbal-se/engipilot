@@ -4,6 +4,7 @@ from sqlalchemy import text
 from api.database import engine, Base, get_db
 from api import models
 from api.routers import projects, sprints, tasks
+from api.github_client import get_repo_activity_summary
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,3 +25,7 @@ def check_db_connection(db: Session = Depends(get_db)):
         return {"database": "connected"}
     except Exception as e:
         return {"database": "error", "detail": str(e)}
+
+@app.get("/github/activity")
+def github_activity():
+    return get_repo_activity_summary()
