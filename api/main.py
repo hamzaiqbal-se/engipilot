@@ -2,11 +2,16 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from api.database import engine, Base, get_db
-from api import models   # <-- ye line zaroori hai, isse SQLAlchemy models register hote hain
+from api import models
+from api.routers import projects, sprints, tasks
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="EngiPilot API", version="0.1.0")
+
+app.include_router(projects.router)
+app.include_router(sprints.router)
+app.include_router(tasks.router)
 
 @app.get("/")
 def root():
