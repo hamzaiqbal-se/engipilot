@@ -3,12 +3,14 @@ from sqlalchemy.orm import Session
 from shared.state_schema import ProjectState
 from agents.engineering_agent import run_engineering_agent
 from agents.risk_agent import run_risk_agent
+from agents.planning_agent import run_planning_agent
 import logging
 
 logger = logging.getLogger("engipilot")
 
 
-# --- Node wrappers: each node takes the state, runs an agent, updates state ---
+# --- Real agent nodes: Engineering, Risk, and Planning are now fully implemented ---
+# --- Remaining stubs for QA, Documentation, and Reporting agents will be added as they're built ---
 
 def engineering_node(state: ProjectState, db: Session) -> ProjectState:
     result = run_engineering_agent(state["project_id"], db)
@@ -26,25 +28,25 @@ def risk_node(state: ProjectState, db: Session) -> ProjectState:
     return state
 
 
-# --- Stub nodes for agents not yet built (Week 2 remaining days) ---
-
-def planning_node_stub(state: ProjectState, db: Session) -> ProjectState:
-    state["planning_data"] = {"status": "not_yet_implemented"}
-    state.setdefault("agent_trace", []).append("planning_agent_stub")
+def planning_node(state: ProjectState, db: Session) -> ProjectState:
+    risk_data = state.get("risk_data")
+    result = run_planning_agent(state["project_id"], db, risk_data=risk_data)
+    state["planning_data"] = result
+    state.setdefault("agent_trace", []).append("planning_agent")
+    logger.info(f"Orchestrator: planning_node completed for project_id={state['project_id']}")
     return state
 
 
 def build_orchestrator_graph(db: Session):
     """
     Builds and compiles the LangGraph orchestrator.
-    Currently wires: Engineering -> Risk -> Planning (stub)
+    Currently wires: Engineering -> Risk -> Planning
     """
     graph = StateGraph(ProjectState)
 
-    # Wrap nodes to inject the db session (LangGraph nodes only take state by default)
     graph.add_node("engineering", lambda state: engineering_node(state, db))
     graph.add_node("risk", lambda state: risk_node(state, db))
-    graph.add_node("planning", lambda state: planning_node_stub(state, db))
+    graph.add_node("planning", lambda state: planning_node(state, db))
 
     graph.set_entry_point("engineering")
     graph.add_edge("engineering", "risk")
