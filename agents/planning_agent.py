@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger("engipilot")
 
-PRIORITY_WEIGHTS = {"high": 3, "medium": 2, "low": 1}
+PRIORITY_WEIGHTS = {"high": 5, "medium": 2, "low": 1}
 
 
 def run_planning_agent(project_id: int, db: Session, risk_data: dict = None) -> dict:
@@ -32,7 +32,7 @@ def run_planning_agent(project_id: int, db: Session, risk_data: dict = None) -> 
     def task_score(task):
         status_boost = 10 if task.status == "in_progress" else 0
         priority_score = PRIORITY_WEIGHTS.get(task.priority, 1)
-        blocked_penalty = -5 if task.status == "blocked" else 0
+        blocked_penalty = -2 if task.status == "blocked" else 0
         return status_boost + priority_score + blocked_penalty
 
     ranked = sorted(pending_tasks, key=task_score, reverse=True)
