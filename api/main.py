@@ -10,6 +10,8 @@ from api.database import SessionLocal
 from agents.risk_agent import extract_risk_features
 from agents.risk_agent import run_risk_agent
 from orchestrator.graph import run_orchestrator
+from agents.planning_agent import run_planning_agent
+from agents.risk_agent import run_risk_agent
 
 
 Base.metadata.create_all(bind=engine)
@@ -67,5 +69,14 @@ def orchestrator_endpoint(project_id: int):
     try:
         result = run_orchestrator(project_id, db)
         return result
+    finally:
+        db.close()
+
+@app.get("/agents/planning/{project_id}")
+def planning_agent_endpoint(project_id: int):
+    db = SessionLocal()
+    try:
+        risk_result = run_risk_agent(project_id, db)
+        return run_planning_agent(project_id, db, risk_data=risk_result)
     finally:
         db.close()
