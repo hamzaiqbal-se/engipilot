@@ -8,6 +8,7 @@ from api.github_client import get_repo_activity_summary
 from agents.engineering_agent import run_engineering_agent
 from api.database import SessionLocal
 from agents.risk_agent import extract_risk_features
+from agents.risk_agent import run_risk_agent
 
 Base.metadata.create_all(bind=engine)
 
@@ -47,5 +48,13 @@ def risk_features_endpoint(project_id: int):
     db = SessionLocal()
     try:
         return extract_risk_features(project_id, db)
+    finally:
+        db.close()
+
+@app.get("/agents/risk/{project_id}")
+def risk_agent_endpoint(project_id: int):
+    db = SessionLocal()
+    try:
+        return run_risk_agent(project_id, db)
     finally:
         db.close()

@@ -2,14 +2,28 @@ from sqlalchemy.orm import Session
 from api import models
 from datetime import datetime
 import logging
+import joblib
+import pandas as pd
 
 logger = logging.getLogger("engipilot")
+
+FEATURE_COLUMNS = [
+    "completion_rate",
+    "blocked_ratio",
+    "velocity",
+    "days_elapsed",
+    "days_to_deadline",
+    "avg_workload_ratio",
+]
+
+_delay_model = None
+_burnout_model = None
 
 
 def extract_risk_features(project_id: int, db: Session) -> dict:
     """
     Extracts ML-ready features for a project, to be used by the
-    Risk Agent's prediction model (trained in the next step).
+    Risk Agent's prediction model.
     """
 
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
@@ -74,3 +88,49 @@ def extract_risk_features(project_id: int, db: Session) -> dict:
 
     logger.info(f"Extracted risk features for project_id={project_id}: {features}")
     return features
+
+
+def _load_models():
+    global _delay_model, _burnout_model
+    if _delay_model is None:
+        _delay_model = joblib.load("agents/models/delay_risk_model.pkl")
+    if _burnout_model is None:
+        _burnout_model = joblib.load("agents/models/burnout_risk_model.pkl")
+
+
+def run_risk_agent(project_id: int, db: Session) -> dict:
+    """
+    Risk Agent: predicts delay risk and burnout risk using the trained XGBoost models.
+    Returns a dict matching the 'risk_data' schema field.
+    """
+    features = extract_risk_features(project_id, db)
+    if "error" in features:
+        return features
+
+    _load_models()
+
+    feature_row = pd.DataFrame([{k: (features[k] if features[k] is not None else 0) for k in FEATURE_COLUMNS}])
+
+    delay_risk = float(_delay_model.predict(feature_row)[0])
+    burnout_risk = float(_burnout_model.predict(feature_row)[0])
+
+    delay_risk = max(0.0, min(1.0, delay_risk))
+    burnout_risk = max(0.0, min(1.0, burnout_risk))
+
+    if delay_risk >= 0.7:
+        completion_forecast = "At Risk"
+    elif delay_risk >= 0.4:
+        completion_forecast = "Needs Attention"
+    else:
+        completion_forecast = "On Track"
+
+    result = {
+        "project_id": project_id,
+        "delay_risk": round(delay_risk, 3),
+        "burnout_risk": round(burnout_risk, 3),
+        "completion_forecast": completion_forecast,
+        "features_used": features,
+    }
+
+    logger.info(f"Risk Agent prediction for project_id={project_id}: delay_risk={delay_risk:.2f}, burnout_risk={burnout_risk:.2f}")
+    return result
