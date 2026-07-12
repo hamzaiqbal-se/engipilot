@@ -8,12 +8,14 @@ class ProjectState(TypedDict, total=False):
     # Filled by Engineering Agent
     engineering_data: Optional[Dict[str, Any]]
 
-    # Filled by other agents later (Week 2-3)
+    # Filled by Risk Agent
     risk_data: Optional[Dict[str, Any]]
+
+    # Filled by other agents (Week 2-3)
     qa_data: Optional[Dict[str, Any]]
     planning_data: Optional[Dict[str, Any]]
     documentation_data: Optional[Dict[str, Any]]
     report_output: Optional[str]
 
-    # Trace log
+    # Trace log — tracks which agents ran, in what order
     agent_trace: List[str]
