@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 venv/
 .venv/
+scripts/training_data.csv
