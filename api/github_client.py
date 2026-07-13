@@ -48,7 +48,9 @@ def get_pull_requests(state: str = "all", limit: int = 10):
             "title": pr["title"],
             "state": pr["state"],
             "created_at": pr["created_at"],
+            "updated_at": pr["updated_at"],
             "merged_at": pr["merged_at"],
+            "draft": pr.get("draft", False),
         })
     return prs
 
