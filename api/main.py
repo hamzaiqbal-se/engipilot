@@ -12,6 +12,7 @@ from agents.risk_agent import run_risk_agent
 from orchestrator.graph import run_orchestrator
 from agents.planning_agent import run_planning_agent
 from agents.risk_agent import run_risk_agent
+from agents.qa_agent import run_qa_agent
 
 
 Base.metadata.create_all(bind=engine)
@@ -80,3 +81,7 @@ def planning_agent_endpoint(project_id: int):
         return run_planning_agent(project_id, db, risk_data=risk_result)
     finally:
         db.close()
+
+@app.get("/agents/qa")
+def qa_agent_endpoint():
+    return run_qa_agent()

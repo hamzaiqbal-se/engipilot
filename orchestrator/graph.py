@@ -4,6 +4,7 @@ from shared.state_schema import ProjectState
 from agents.engineering_agent import run_engineering_agent
 from agents.risk_agent import run_risk_agent
 from agents.planning_agent import run_planning_agent
+from agents.qa_agent import run_qa_agent
 import logging
 
 logger = logging.getLogger("engipilot")
@@ -47,11 +48,13 @@ def build_orchestrator_graph(db: Session):
     graph.add_node("engineering", lambda state: engineering_node(state, db))
     graph.add_node("risk", lambda state: risk_node(state, db))
     graph.add_node("planning", lambda state: planning_node(state, db))
+    graph.add_node("qa", lambda state: qa_node(state, db))
 
     graph.set_entry_point("engineering")
     graph.add_edge("engineering", "risk")
     graph.add_edge("risk", "planning")
-    graph.add_edge("planning", END)
+    graph.add_edge("planning", "qa")
+    graph.add_edge("qa", END)
 
     return graph.compile()
 
@@ -69,3 +72,10 @@ def run_orchestrator(project_id: int, db: Session) -> ProjectState:
     final_state = compiled_graph.invoke(initial_state)
     logger.info(f"Orchestrator run complete for project_id={project_id}. Trace: {final_state.get('agent_trace')}")
     return final_state
+
+def qa_node(state: ProjectState, db: Session) -> ProjectState:
+    result = run_qa_agent()
+    state["qa_data"] = result
+    state.setdefault("agent_trace", []).append("qa_agent")
+    logger.info(f"Orchestrator: qa_node completed for project_id={state['project_id']}")
+    return state
