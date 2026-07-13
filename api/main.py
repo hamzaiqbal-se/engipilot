@@ -13,9 +13,8 @@ from orchestrator.graph import run_orchestrator
 from agents.planning_agent import run_planning_agent
 from agents.risk_agent import run_risk_agent
 from agents.qa_agent import run_qa_agent
+from shared.vector_store import add_document, search_documents
 
-
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="EngiPilot API", version="0.1.0")
 
@@ -85,3 +84,13 @@ def planning_agent_endpoint(project_id: int):
 @app.get("/agents/qa")
 def qa_agent_endpoint():
     return run_qa_agent()
+
+@app.post("/rag/add")
+def rag_add_document(doc_id: str, text: str):
+    add_document(doc_id, text)
+    return {"status": "added", "doc_id": doc_id}
+
+@app.get("/rag/search")
+def rag_search(query: str):
+    results = search_documents(query)
+    return results
