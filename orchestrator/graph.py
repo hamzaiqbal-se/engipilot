@@ -5,6 +5,7 @@ from agents.engineering_agent import run_engineering_agent
 from agents.risk_agent import run_risk_agent
 from agents.planning_agent import run_planning_agent
 from agents.qa_agent import run_qa_agent
+from agents.documentation_agent import run_documentation_agent
 import logging
 
 logger = logging.getLogger("engipilot")
@@ -49,12 +50,14 @@ def build_orchestrator_graph(db: Session):
     graph.add_node("risk", lambda state: risk_node(state, db))
     graph.add_node("planning", lambda state: planning_node(state, db))
     graph.add_node("qa", lambda state: qa_node(state, db))
+    graph.add_node("documentation", lambda state: documentation_node(state, db))
 
     graph.set_entry_point("engineering")
     graph.add_edge("engineering", "risk")
     graph.add_edge("risk", "planning")
     graph.add_edge("planning", "qa")
-    graph.add_edge("qa", END)
+    graph.add_edge("qa", "documentation")
+    graph.add_edge("documentation", END)
 
     return graph.compile()
 
@@ -78,4 +81,12 @@ def qa_node(state: ProjectState, db: Session) -> ProjectState:
     state["qa_data"] = result
     state.setdefault("agent_trace", []).append("qa_agent")
     logger.info(f"Orchestrator: qa_node completed for project_id={state['project_id']}")
+    return state
+
+def documentation_node(state: ProjectState, db: Session) -> ProjectState:
+    query = "What is the architecture and tech stack of this project?"
+    result = run_documentation_agent(query)
+    state["documentation_data"] = result
+    state.setdefault("agent_trace", []).append("documentation_agent")
+    logger.info(f"Orchestrator: documentation_node completed for project_id={state['project_id']}")
     return state
