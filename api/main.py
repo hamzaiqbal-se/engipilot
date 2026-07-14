@@ -14,6 +14,7 @@ from agents.planning_agent import run_planning_agent
 from agents.risk_agent import run_risk_agent
 from agents.qa_agent import run_qa_agent
 from shared.vector_store import add_document, search_documents
+from agents.documentation_agent import index_project_documents, run_documentation_agent
 
 
 app = FastAPI(title="EngiPilot API", version="0.1.0")
@@ -94,3 +95,11 @@ def rag_add_document(doc_id: str, text: str):
 def rag_search(query: str):
     results = search_documents(query)
     return results
+
+@app.post("/agents/documentation/index")
+def documentation_index_endpoint():
+    return index_project_documents()
+
+@app.get("/agents/documentation/query")
+def documentation_query_endpoint(query: str):
+    return run_documentation_agent(query)
