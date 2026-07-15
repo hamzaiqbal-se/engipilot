@@ -7,6 +7,7 @@ from agents.planning_agent import run_planning_agent
 from agents.qa_agent import run_qa_agent
 from agents.documentation_agent import run_documentation_agent
 from agents.reporting_agent import run_reporting_agent
+from agents.automation_agent import run_automation_checks
 import logging
 
 logger = logging.getLogger("engipilot")
@@ -53,6 +54,7 @@ def build_orchestrator_graph(db: Session):
     graph.add_node("qa", lambda state: qa_node(state, db))
     graph.add_node("documentation", lambda state: documentation_node(state, db))
     graph.add_node("reporting", lambda state: reporting_node(state, db))
+    graph.add_node("automation", lambda state: automation_node(state, db))
 
     graph.set_entry_point("engineering")
     graph.add_edge("engineering", "risk")
@@ -60,7 +62,8 @@ def build_orchestrator_graph(db: Session):
     graph.add_edge("planning", "qa")
     graph.add_edge("qa", "documentation")
     graph.add_edge("documentation", "reporting")
-    graph.add_edge("reporting", END)
+    graph.add_edge("reporting", "automation")
+    graph.add_edge("automation", END)
 
     return graph.compile()
 
@@ -99,4 +102,11 @@ def reporting_node(state: ProjectState, db: Session) -> ProjectState:
     state["report_output"] = result
     state.setdefault("agent_trace", []).append("reporting_agent")
     logger.info(f"Orchestrator: reporting_node completed for project_id={state['project_id']}")
+    return state
+
+def automation_node(state: ProjectState, db: Session) -> ProjectState:
+    result = run_automation_checks(state, db)
+    state["automation_data"] = result
+    state.setdefault("agent_trace", []).append("automation_agent")
+    logger.info(f"Orchestrator: automation_node completed for project_id={state['project_id']}")
     return state

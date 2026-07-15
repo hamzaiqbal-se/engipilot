@@ -19,3 +19,6 @@ class ProjectState(TypedDict, total=False):
 
     # Trace log — tracks which agents ran, in what order
     agent_trace: List[str]
+
+    # Filled by Automation Agent
+    automation_data: Optional[Dict[str, Any]]
