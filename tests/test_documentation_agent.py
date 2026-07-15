@@ -14,14 +14,15 @@ def test_documentation_agent_returns_answer(monkeypatch):
     class FakeResponse:
         text = "EngiPilot uses XGBoost models to predict risk."
 
-    class FakeModel:
-        def generate_content(self, prompt):
+    class FakeModels:
+        def generate_content(self, model, contents):
             return FakeResponse()
 
+    class FakeClient:
+        models = FakeModels()
+
     monkeypatch.setattr("agents.documentation_agent.search_documents", fake_search)
-    monkeypatch.setattr(
-        "agents.documentation_agent.genai.GenerativeModel", lambda name: FakeModel()
-    )
+    monkeypatch.setattr("agents.documentation_agent._get_client", lambda: FakeClient())
 
     result = run_documentation_agent("What models does the Risk Agent use?")
 
