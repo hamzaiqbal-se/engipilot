@@ -15,6 +15,11 @@ from agents.risk_agent import run_risk_agent
 from agents.qa_agent import run_qa_agent
 from shared.vector_store import add_document, search_documents
 from agents.documentation_agent import index_project_documents, run_documentation_agent
+from agents.reporting_agent import run_reporting_agent
+from agents.engineering_agent import run_engineering_agent
+from agents.risk_agent import run_risk_agent
+from agents.planning_agent import run_planning_agent
+from agents.qa_agent import run_qa_agent
 
 
 app = FastAPI(title="EngiPilot API", version="0.1.0")
@@ -103,3 +108,23 @@ def documentation_index_endpoint():
 @app.get("/agents/documentation/query")
 def documentation_query_endpoint(query: str):
     return run_documentation_agent(query)
+
+@app.get("/agents/reporting/{project_id}")
+def reporting_agent_endpoint(project_id: int):
+    db = SessionLocal()
+    try:
+        engineering_result = run_engineering_agent(project_id, db)
+        risk_result = run_risk_agent(project_id, db)
+        planning_result = run_planning_agent(project_id, db, risk_data=risk_result)
+        qa_result = run_qa_agent()
+
+        state = {
+            "project_id": project_id,
+            "engineering_data": engineering_result,
+            "risk_data": risk_result,
+            "planning_data": planning_result,
+            "qa_data": qa_result,
+        }
+        return run_reporting_agent(state)
+    finally:
+        db.close()
