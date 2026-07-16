@@ -46,8 +46,8 @@ def run_documentation_agent(query: str) -> dict:
     try:
         results = search_documents(query, n_results=3)
     except Exception as e:
-        logger.info(f"Documentation Agent: retrieval failed — {e}")
-        return {"error": str(e)}
+        logger.info(f"Documentation Agent: Gemini generation failed — {e}")
+        return {"query": query, "answer": f"Sorry, I couldn't generate an answer right now.", "sources": []}
 
     retrieved_docs = results.get("documents", [[]])[0]
     retrieved_ids = results.get("ids", [[]])[0]
