@@ -11,6 +11,8 @@ import { getProjects, getOrchestratorRun } from "@/lib/api";
 import { OrchestratorResult } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
 import AskEngiPilot from "@/components/AskEngiPilot";
+import AgentPipeline3D from "@/components/AgentPipeline3D";
+import CommandPalette from "@/components/CommandPalette";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<{ id: number; name: string }[]>([]);
@@ -37,6 +39,7 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       <Sidebar active={activeView} onSelect={setActiveView} />
+      <CommandPalette onSelect={setActiveView} />
 
       <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -91,6 +94,7 @@ export default function Dashboard() {
 
               {activeView === "Overview" && (
                 <div className="space-y-4 md:space-y-6">
+                  <AgentPipeline3D agentTrace={data.agent_trace} />
                   <AskEngiPilot />
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                     <SprintReportCard engineering={data.engineering_data} planning={data.planning_data} />

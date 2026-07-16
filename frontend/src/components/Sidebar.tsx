@@ -19,6 +19,7 @@ export default function Sidebar({ active, onSelect }: { active: string; onSelect
     <>
       <div className="mb-8 px-2">
         <h1 className="text-xl font-bold text-white">EngiPilot</h1>
+        <p className="text-[10px] text-slate-600 mt-1">Press ⌘K to search</p>
         <p className="text-xs text-slate-500">AI Engineering Co-Pilot</p>
       </div>
       <nav className="flex flex-col gap-1">
