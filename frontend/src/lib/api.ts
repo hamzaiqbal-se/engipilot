@@ -61,3 +61,8 @@ export const getCurrentSprint = async (projectId: number) => {
   const res = await api.get(`/projects/${projectId}/current-sprint`);
   return res.data;
 };
+
+export const getProjectSprints = async (projectId: number) => {
+  const res = await api.get(`/projects/${projectId}/sprints`);
+  return res.data;
+};
