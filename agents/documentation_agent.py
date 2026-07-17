@@ -1,18 +1,8 @@
-import os
-from google import genai
+from shared.gemini_client import generate_text
 from shared.vector_store import search_documents, add_document
 import logging
 
 logger = logging.getLogger("engipilot")
-
-_client = None
-
-
-def _get_client():
-    global _client
-    if _client is None:
-        _client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    return _client
 
 
 def index_project_documents():
@@ -73,12 +63,7 @@ Question: {query}
 Answer:"""
 
     try:
-        client = _get_client()
-        response = client.models.generate_content(
-            model="gemini-flash-latest",
-            contents=prompt
-        )
-        answer = response.text.strip()
+        answer = generate_text(prompt)
     except Exception as e:
         logger.info(f"Documentation Agent: Gemini generation failed — {e}")
         return {"error": f"LLM generation failed: {str(e)}"}

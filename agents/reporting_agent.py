@@ -1,18 +1,8 @@
 from sqlalchemy.orm import Session
-from google import genai
-import os
+from shared.gemini_client import generate_text
 import logging
 
 logger = logging.getLogger("engipilot")
-
-_client = None
-
-
-def _get_client():
-    global _client
-    if _client is None:
-        _client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    return _client
 
 
 def run_reporting_agent(state: dict) -> dict:
@@ -40,12 +30,7 @@ QA / Review Queue: {qa_data}
 Write the report now:"""
 
     try:
-        client = _get_client()
-        response = client.models.generate_content(
-            model="gemini-flash-latest",
-            contents=prompt
-        )
-        report_text = response.text.strip()
+        report_text = generate_text(prompt)
     except Exception as e:
         logger.info(f"Reporting Agent: Gemini generation failed — {e}")
         return {"error": f"LLM generation failed: {str(e)}"}
