@@ -9,12 +9,14 @@ class ProjectCreate(BaseModel):
     technology: str
     deadline: Optional[datetime] = None
     status: Optional[str] = "active"
+    github_repo: Optional[str] = None  # <-- NAYA
 
 class ProjectUpdate(BaseModel):
     name: Optional[str] = None
     technology: Optional[str] = None
     deadline: Optional[datetime] = None
     status: Optional[str] = None
+    github_repo: Optional[str] = None  # <-- NAYA
 
 class ProjectResponse(BaseModel):
     id: int
@@ -23,6 +25,7 @@ class ProjectResponse(BaseModel):
     start_date: Optional[datetime]
     deadline: Optional[datetime]
     status: str
+    github_repo: Optional[str]  # <-- NAYA
 
     class Config:
         from_attributes = True

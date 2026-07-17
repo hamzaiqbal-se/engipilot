@@ -9,10 +9,11 @@ class Project(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    technology = Column(String, nullable=False)   # e.g. "AI/ML", "MERN", "Laravel"
+    technology = Column(String, nullable=False)
     start_date = Column(DateTime, server_default=func.now())
     deadline = Column(DateTime, nullable=True)
-    status = Column(String, default="active")      # active, completed, at_risk, blocked
+    status = Column(String, default="active")
+    github_repo = Column(String, nullable=True)  # <-- NAYA FIELD
 
     sprints = relationship("Sprint", back_populates="project", cascade="all, delete")
 

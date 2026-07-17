@@ -46,7 +46,7 @@ def run_engineering_agent(project_id: int, db: Session) -> dict:
     is_inactive = False
     last_commit_date = None
     try:
-        github_activity = get_repo_activity_summary()
+        github_activity = get_repo_activity_summary(repo=project.github_repo)
         commits = github_activity.get("commits", [])
         if commits:
             last_commit_date = commits[0]["date"]  # most recent commit

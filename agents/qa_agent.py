@@ -5,17 +5,12 @@ import logging
 logger = logging.getLogger("engipilot")
 
 
-def run_qa_agent() -> dict:
+def run_qa_agent(repo: str = None) -> dict:
     """
-    QA Agent:
-    - Fetches open pull requests
-    - Scores each by how long it's been open (age-based urgency)
-    - Returns a ranked review priority queue
-    Returns a dict matching the 'qa_data' schema field.
+    QA Agent: fetches open pull requests for the given repo and scores review priority.
     """
-
     try:
-        prs = get_pull_requests(state="open", limit=20)
+        prs = get_pull_requests(repo=repo, state="open", limit=20)
     except Exception as e:
         logger.info(f"QA Agent: failed to fetch PRs — {e}")
         return {"error": str(e)}
