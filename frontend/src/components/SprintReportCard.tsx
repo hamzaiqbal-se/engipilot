@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { PlanningData, EngineeringData } from "@/lib/types";
+import { Calendar, TrendingUp, TrendingDown } from "lucide-react";
 
 export default function SprintReportCard({
   engineering,
@@ -39,6 +40,34 @@ export default function SprintReportCard({
         <p className="text-xs text-slate-500 uppercase mb-2">Suggested Sprint Goal</p>
         <p className="text-slate-200 text-sm">{planning.suggested_sprint_goal}</p>
       </div>
+
+      {planning.timeline_adjustment && planning.timeline_adjustment.suggested_deadline && (
+        <div className="border-t border-[var(--border)] pt-4 mt-4">
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 uppercase mb-2">
+            <Calendar size={12} /> Timeline Forecast
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <div>
+              <p className="text-slate-500 text-xs">Original Deadline</p>
+              <p className="text-slate-300">
+                {planning.timeline_adjustment.original_deadline
+                  ? new Date(planning.timeline_adjustment.original_deadline).toLocaleDateString()
+                  : "Not set"}
+              </p>
+            </div>
+            <div className={planning.timeline_adjustment.is_at_risk ? "text-red-400" : "text-green-400"}>
+              {planning.timeline_adjustment.is_at_risk ? <TrendingDown size={18} /> : <TrendingUp size={18} />}
+            </div>
+            <div className="text-right">
+              <p className="text-slate-500 text-xs">Projected Completion</p>
+              <p className={planning.timeline_adjustment.is_at_risk ? "text-red-400" : "text-green-400"}>
+                {new Date(planning.timeline_adjustment.suggested_deadline).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 mt-2">{planning.timeline_adjustment.adjustment_message}</p>
+        </div>
+      )}
 
       <div className="mt-4 space-y-2">
         {planning.ranked_tasks.slice(0, 4).map((task) => (
