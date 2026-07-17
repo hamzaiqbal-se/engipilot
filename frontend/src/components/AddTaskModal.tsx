@@ -8,18 +8,39 @@ import { createTask } from "@/lib/api";
 const STATUS_OPTIONS = ["todo", "in_progress", "blocked", "done"];
 const PRIORITY_OPTIONS = ["low", "medium", "high"];
 
-export default function AddTaskModal({ sprintId, onCreated }: { sprintId: number | null; onCreated: () => void }) {
+interface SprintOption {
+  id: number;
+  sprint_number: number;
+  goal: string | null;
+}
+
+export default function AddTaskModal({
+  sprints,
+  defaultSprintId,
+  onCreated,
+}: {
+  sprints: SprintOption[];
+  defaultSprintId: number | null;
+  onCreated: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({ title: "", status: "todo", priority: "medium" });
+  const [form, setForm] = useState({
+    title: "",
+    status: "todo",
+    priority: "medium",
+    sprintId: defaultSprintId ?? (sprints[0]?.id ?? null),
+  });
+
+  const optionStyle = { background: "#131a29", color: "#f1f5f9" };
 
   const resetAndClose = () => {
     setOpen(false);
     setSuccess(false);
     setError("");
-    setForm({ title: "", status: "todo", priority: "medium" });
+    setForm({ title: "", status: "todo", priority: "medium", sprintId: defaultSprintId ?? (sprints[0]?.id ?? null) });
   };
 
   const handleSubmit = async () => {
@@ -27,14 +48,19 @@ export default function AddTaskModal({ sprintId, onCreated }: { sprintId: number
       setError("Task title is required.");
       return;
     }
-    if (!sprintId) {
-      setError("No active sprint found for this project.");
+    if (!form.sprintId) {
+      setError("No sprint available — create a sprint first.");
       return;
     }
     setError("");
     setLoading(true);
     try {
-      await createTask({ sprint_id: sprintId, title: form.title, status: form.status, priority: form.priority });
+      await createTask({
+        sprint_id: form.sprintId,
+        title: form.title,
+        status: form.status,
+        priority: form.priority,
+      });
       setSuccess(true);
       onCreated();
       setTimeout(resetAndClose, 1000);
@@ -44,8 +70,6 @@ export default function AddTaskModal({ sprintId, onCreated }: { sprintId: number
       setLoading(false);
     }
   };
-
-  const optionStyle = { background: "#131a29", color: "#f1f5f9" };
 
   return (
     <>
@@ -88,6 +112,23 @@ export default function AddTaskModal({ sprintId, onCreated }: { sprintId: number
                         placeholder="e.g. Fix login bug"
                       />
                     </div>
+
+                    {sprints.length > 1 && (
+                      <div>
+                        <label className="text-xs text-slate-500">Sprint</label>
+                        <select
+                          value={form.sprintId ?? ""}
+                          onChange={(e) => setForm({ ...form, sprintId: Number(e.target.value) })}
+                          className="w-full mt-1 bg-white/5 border border-[var(--border)] text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500/50"
+                        >
+                          {sprints.map((s) => (
+                            <option key={s.id} value={s.id} style={optionStyle}>
+                              Sprint {s.sprint_number}{s.goal ? ` — ${s.goal}` : ""}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>

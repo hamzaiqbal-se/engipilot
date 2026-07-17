@@ -7,7 +7,7 @@ import SprintReportCard from "@/components/SprintReportCard";
 import RiskReportCard from "@/components/RiskReportCard";
 import ProductivityReportCard from "@/components/ProductivityReportCard";
 import TeamPerformanceCard from "@/components/TeamPerformanceCard";
-import { getProjects, getOrchestratorRun } from "@/lib/api";
+import { getProjects, getOrchestratorRun, getProjectSprints } from "@/lib/api";
 import { OrchestratorResult } from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
 import AskEngiPilot from "@/components/AskEngiPilot";
@@ -16,7 +16,13 @@ import CommandPalette from "@/components/CommandPalette";
 import RetrospectiveCard from "@/components/RetrospectiveCard";
 import NewProjectModal from "@/components/NewProjectModal";
 import AddTaskModal from "@/components/AddTaskModal";
-import { getCurrentSprint } from "@/lib/api";
+import AddSprintModal from "@/components/AddSprintModal";
+
+interface SprintOption {
+  id: number;
+  sprint_number: number;
+  goal: string | null;
+}
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<{ id: number; name: string }[]>([]);
@@ -24,7 +30,7 @@ export default function Dashboard() {
   const [data, setData] = useState<OrchestratorResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeView, setActiveView] = useState("Sprint Report");
-  const [currentSprintId, setCurrentSprintId] = useState<number | null>(null);
+  const [sprints, setSprints] = useState<SprintOption[]>([]);
 
   const refreshProjects = () => {
     getProjects().then((res) => {
@@ -33,6 +39,16 @@ export default function Dashboard() {
         setSelectedProject(res[0].id);
       }
     });
+  };
+
+  const refreshSprints = () => {
+    if (selectedProject === null) return;
+    getProjectSprints(selectedProject).then(setSprints);
+  };
+
+  const refreshOrchestratorData = () => {
+    if (selectedProject === null) return;
+    getOrchestratorRun(selectedProject).then(setData);
   };
 
   useEffect(() => {
@@ -45,12 +61,11 @@ export default function Dashboard() {
     getOrchestratorRun(selectedProject)
       .then((res) => setData(res))
       .finally(() => setLoading(false));
+    refreshSprints();
   }, [selectedProject]);
 
-  useEffect(() => {
-    if (selectedProject === null) return;
-    getCurrentSprint(selectedProject).then((res) => setCurrentSprintId(res.sprint_id));
-  }, [selectedProject]);
+  const latestSprintId = sprints[0]?.id ?? null;
+  const nextSprintNumber = sprints.length > 0 ? sprints[0].sprint_number + 1 : 1;
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
@@ -108,11 +123,20 @@ export default function Dashboard() {
                   <ProductivityReportCard engineering={data.engineering_data} qa={data.qa_data} />
                 </div>
               )}
-              
-              {activeView === "Team Performance" && (
+
+              {activeView === "Team Performance" && selectedProject !== null && (
                 <div className="space-y-4">
-                  <div className="flex justify-end">
-                    <AddTaskModal sprintId={currentSprintId} onCreated={() => selectedProject && getOrchestratorRun(selectedProject).then(setData)} />
+                  <div className="flex justify-end gap-2">
+                    <AddSprintModal
+                      projectId={selectedProject}
+                      nextSprintNumber={nextSprintNumber}
+                      onCreated={refreshSprints}
+                    />
+                    <AddTaskModal
+                      sprints={sprints}
+                      defaultSprintId={latestSprintId}
+                      onCreated={refreshOrchestratorData}
+                    />
                   </div>
                   <TeamPerformanceCard planning={data.planning_data} engineering={data.engineering_data} />
                 </div>

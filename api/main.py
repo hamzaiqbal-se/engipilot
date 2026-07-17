@@ -180,3 +180,17 @@ def get_current_sprint(project_id: int):
         return {"sprint_id": sprint.id}
     finally:
         db.close()
+
+@app.get("/projects/{project_id}/sprints")
+def get_project_sprints(project_id: int):
+    db = SessionLocal()
+    try:
+        sprints = (
+            db.query(models.Sprint)
+            .filter(models.Sprint.project_id == project_id)
+            .order_by(models.Sprint.sprint_number.desc())
+            .all()
+        )
+        return [{"id": s.id, "sprint_number": s.sprint_number, "goal": s.goal} for s in sprints]
+    finally:
+        db.close()
