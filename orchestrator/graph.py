@@ -1,3 +1,4 @@
+from api import models
 from langgraph.graph import StateGraph, END
 from sqlalchemy.orm import Session
 from shared.state_schema import ProjectState
@@ -83,10 +84,10 @@ def run_orchestrator(project_id: int, db: Session) -> ProjectState:
     return final_state
 
 def qa_node(state: ProjectState, db: Session) -> ProjectState:
-    result = run_qa_agent()
+    project = db.query(models.Project).filter(models.Project.id == state["project_id"]).first()
+    result = run_qa_agent(repo=project.github_repo if project else None)
     state["qa_data"] = result
     state.setdefault("agent_trace", []).append("qa_agent")
-    logger.info(f"Orchestrator: qa_node completed for project_id={state['project_id']}")
     return state
 
 def documentation_node(state: ProjectState, db: Session) -> ProjectState:

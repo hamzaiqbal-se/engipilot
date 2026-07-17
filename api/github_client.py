@@ -4,12 +4,10 @@ from dotenv import load_dotenv
 import logging
 
 logger = logging.getLogger("engipilot")
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-
 load_dotenv()
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_REPO = os.getenv("GITHUB_REPO")
+DEFAULT_GITHUB_REPO = os.getenv("GITHUB_REPO")  # fallback agar project ka apna repo na ho
 
 BASE_URL = "https://api.github.com"
 HEADERS = {
@@ -18,9 +16,10 @@ HEADERS = {
 }
 
 
-def get_recent_commits(limit: int = 10):
-    """Fetch recent commits from the repo."""
-    url = f"{BASE_URL}/repos/{GITHUB_REPO}/commits"
+def get_recent_commits(repo: str = None, limit: int = 10):
+    """Fetch recent commits from the given repo (or default repo if none specified)."""
+    repo = repo or DEFAULT_GITHUB_REPO
+    url = f"{BASE_URL}/repos/{repo}/commits"
     response = requests.get(url, headers=HEADERS, params={"per_page": limit})
     response.raise_for_status()
 
@@ -35,9 +34,10 @@ def get_recent_commits(limit: int = 10):
     return commits
 
 
-def get_pull_requests(state: str = "all", limit: int = 10):
-    """Fetch pull requests (open, closed, or all)."""
-    url = f"{BASE_URL}/repos/{GITHUB_REPO}/pulls"
+def get_pull_requests(repo: str = None, state: str = "all", limit: int = 10):
+    """Fetch pull requests from the given repo (or default repo if none specified)."""
+    repo = repo or DEFAULT_GITHUB_REPO
+    url = f"{BASE_URL}/repos/{repo}/pulls"
     response = requests.get(url, headers=HEADERS, params={"state": state, "per_page": limit})
     response.raise_for_status()
 
@@ -55,12 +55,12 @@ def get_pull_requests(state: str = "all", limit: int = 10):
     return prs
 
 
-def get_repo_activity_summary():
-    """Combine commits + PRs into one summary — this is what the Engineering Agent will consume."""
-    commits = get_recent_commits()
-    prs = get_pull_requests()
-    logger.info(f"Fetched GitHub activity: {len(commits)} commits, {len(prs)} PRs")
-    
+def get_repo_activity_summary(repo: str = None):
+    """Combine commits + PRs into one summary for the given repo."""
+    commits = get_recent_commits(repo=repo)
+    prs = get_pull_requests(repo=repo)
+    logger.info(f"Fetched GitHub activity for repo={repo or DEFAULT_GITHUB_REPO}: {len(commits)} commits, {len(prs)} PRs")
+
     return {
         "total_recent_commits": len(commits),
         "total_recent_prs": len(prs),
