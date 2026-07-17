@@ -14,6 +14,7 @@ import AskEngiPilot from "@/components/AskEngiPilot";
 import AgentPipeline3D from "@/components/AgentPipeline3D";
 import CommandPalette from "@/components/CommandPalette";
 import RetrospectiveCard from "@/components/RetrospectiveCard";
+import NewProjectModal from "@/components/NewProjectModal";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<{ id: number; name: string }[]>([]);
@@ -22,11 +23,17 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [activeView, setActiveView] = useState("Sprint Report");
 
-  useEffect(() => {
+  const refreshProjects = () => {
     getProjects().then((res) => {
       setProjects(res);
-      if (res.length > 0) setSelectedProject(res[0].id);
+      if (res.length > 0 && selectedProject === null) {
+        setSelectedProject(res[0].id);
+      }
     });
+  };
+
+  useEffect(() => {
+    refreshProjects();
   }, []);
 
   useEffect(() => {
@@ -45,15 +52,20 @@ export default function Dashboard() {
       <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-white">Manager Dashboard</h2>
-          <select
-            value={selectedProject ?? ""}
-            onChange={(e) => setSelectedProject(Number(e.target.value))}
-            className="bg-[var(--surface-solid)] border border-[var(--border)] text-white text-sm rounded-lg px-3 py-2 w-full sm:w-auto"
-          >
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <select
+              value={selectedProject ?? ""}
+              onChange={(e) => setSelectedProject(Number(e.target.value))}
+              className="bg-[var(--surface-solid)] border border-[var(--border)] text-white text-sm rounded-lg px-3 py-2 flex-1 sm:flex-none"
+            >
+              {projects.map((p) => (
+                <option key={p.id} value={p.id} style={{ background: "#131a29", color: "#f1f5f9" }}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+            <NewProjectModal onCreated={refreshProjects} />
+          </div>
         </div>
 
         {loading && <p className="text-slate-500">Loading agent data...</p>}

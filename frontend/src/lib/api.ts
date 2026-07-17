@@ -26,3 +26,33 @@ export const getRetrospective = async (projectId: number) => {
   const res = await api.get(`/agents/retrospective/${projectId}`);
   return res.data;
 };
+
+export const createProject = async (data: {
+  name: string;
+  technology: string;
+  status?: string;
+  deadline?: string;
+  github_repo?: string;
+}) => {
+  const res = await api.post(`/projects/`, data);
+  return res.data;
+};
+
+export const createSprint = async (data: {
+  project_id: number;
+  sprint_number: number;
+  goal?: string;
+}) => {
+  const res = await api.post(`/sprints/`, data);
+  return res.data;
+};
+
+export const createTask = async (data: {
+  sprint_id: number;
+  title: string;
+  status?: string;
+  priority?: string;
+}) => {
+  const res = await api.post(`/tasks/`, data);
+  return res.data;
+};
