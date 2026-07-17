@@ -32,6 +32,13 @@ export interface PlanningData {
   }[];
   suggested_sprint_goal: string;
   feasibility: string;
+  timeline_adjustment?: {
+    original_deadline: string | null;
+    suggested_deadline: string | null;
+    estimated_days_remaining: number | null;
+    adjustment_message: string;
+    is_at_risk: boolean;
+  };
 }
 
 export interface OrchestratorResult {
