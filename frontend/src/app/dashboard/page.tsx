@@ -13,6 +13,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import AskEngiPilot from "@/components/AskEngiPilot";
 import AgentPipeline3D from "@/components/AgentPipeline3D";
 import CommandPalette from "@/components/CommandPalette";
+import RetrospectiveCard from "@/components/RetrospectiveCard";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<{ id: number; name: string }[]>([]);
@@ -96,6 +97,7 @@ export default function Dashboard() {
                 <div className="space-y-4 md:space-y-6">
                   <AgentPipeline3D agentTrace={data.agent_trace} />
                   <AskEngiPilot />
+                  <RetrospectiveCard projectId={selectedProject!} />
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                     <SprintReportCard engineering={data.engineering_data} planning={data.planning_data} />
                     <RiskReportCard risk={data.risk_data} />

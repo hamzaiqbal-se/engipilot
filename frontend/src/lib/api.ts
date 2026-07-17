@@ -21,3 +21,8 @@ export const askDocumentation = async (query: string) => {
   const res = await api.get(`/agents/documentation/query`, { params: { query } });
   return res.data;
 };
+
+export const getRetrospective = async (projectId: number) => {
+  const res = await api.get(`/agents/retrospective/${projectId}`);
+  return res.data;
+};
