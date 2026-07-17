@@ -56,3 +56,8 @@ export const createTask = async (data: {
   const res = await api.post(`/tasks/`, data);
   return res.data;
 };
+
+export const getCurrentSprint = async (projectId: number) => {
+  const res = await api.get(`/projects/${projectId}/current-sprint`);
+  return res.data;
+};

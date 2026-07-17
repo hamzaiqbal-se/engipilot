@@ -15,6 +15,8 @@ import AgentPipeline3D from "@/components/AgentPipeline3D";
 import CommandPalette from "@/components/CommandPalette";
 import RetrospectiveCard from "@/components/RetrospectiveCard";
 import NewProjectModal from "@/components/NewProjectModal";
+import AddTaskModal from "@/components/AddTaskModal";
+import { getCurrentSprint } from "@/lib/api";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<{ id: number; name: string }[]>([]);
@@ -22,6 +24,7 @@ export default function Dashboard() {
   const [data, setData] = useState<OrchestratorResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeView, setActiveView] = useState("Sprint Report");
+  const [currentSprintId, setCurrentSprintId] = useState<number | null>(null);
 
   const refreshProjects = () => {
     getProjects().then((res) => {
@@ -42,6 +45,11 @@ export default function Dashboard() {
     getOrchestratorRun(selectedProject)
       .then((res) => setData(res))
       .finally(() => setLoading(false));
+  }, [selectedProject]);
+
+  useEffect(() => {
+    if (selectedProject === null) return;
+    getCurrentSprint(selectedProject).then((res) => setCurrentSprintId(res.sprint_id));
   }, [selectedProject]);
 
   return (
@@ -100,9 +108,14 @@ export default function Dashboard() {
                   <ProductivityReportCard engineering={data.engineering_data} qa={data.qa_data} />
                 </div>
               )}
-
+              
               {activeView === "Team Performance" && (
-                <TeamPerformanceCard planning={data.planning_data} engineering={data.engineering_data} />
+                <div className="space-y-4">
+                  <div className="flex justify-end">
+                    <AddTaskModal sprintId={currentSprintId} onCreated={() => selectedProject && getOrchestratorRun(selectedProject).then(setData)} />
+                  </div>
+                  <TeamPerformanceCard planning={data.planning_data} engineering={data.engineering_data} />
+                </div>
               )}
 
               {activeView === "Overview" && (

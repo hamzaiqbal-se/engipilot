@@ -164,3 +164,19 @@ def retrospective_endpoint(project_id: int):
         return generate_sprint_retrospective(state)
     finally:
         db.close()
+
+@app.get("/projects/{project_id}/current-sprint")
+def get_current_sprint(project_id: int):
+    db = SessionLocal()
+    try:
+        sprint = (
+            db.query(models.Sprint)
+            .filter(models.Sprint.project_id == project_id)
+            .order_by(models.Sprint.sprint_number.desc())
+            .first()
+        )
+        if not sprint:
+            return {"sprint_id": None}
+        return {"sprint_id": sprint.id}
+    finally:
+        db.close()
