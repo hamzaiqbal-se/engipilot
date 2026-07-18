@@ -1,0 +1,155 @@
+<svg viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: bold 26px 'Segoe UI', sans-serif; fill: #0f172a; }
+      .subtitle { font: 14px 'Segoe UI', sans-serif; fill: #64748b; }
+      .layer-label { font: bold 13px 'Segoe UI', sans-serif; fill: #64748b; letter-spacing: 1px; }
+      .box-title { font: bold 13px 'Segoe UI', sans-serif; fill: #ffffff; }
+      .box-sub { font: 10.5px 'Segoe UI', sans-serif; fill: #e2e8f0; }
+      .arrow { stroke: #94a3b8; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .arrow-dashed { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 4,3; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="900" fill="#f8fafc"/>
+
+  <text x="40" y="45" class="title">EngiPilot — Multi-Agent Architecture</text>
+  <text x="40" y="68" class="subtitle">Autonomous AI Project Manager &amp; Engineering Agent Platform</text>
+
+  <!-- Frontend Layer -->
+  <text x="40" y="110" class="layer-label">FRONTEND (Next.js)</text>
+  <rect x="40" y="120" width="1120" height="70" rx="10" fill="#1e3a8a"/>
+  <text x="60" y="148" class="box-title">Manager Dashboard</text>
+  <text x="60" y="165" class="box-sub">Sprint / Risk / Productivity / Team Performance / Executive views · 3D Agent Pipeline · Ask EngiPilot · Command Palette</text>
+
+  <path d="M600,190 L600,215" class="arrow"/>
+  <text x="615" y="207" class="subtitle" font-size="11">REST API (Axios)</text>
+
+  <!-- API Layer -->
+  <text x="40" y="235" class="layer-label">API LAYER (FastAPI)</text>
+  <rect x="40" y="245" width="1120" height="60" rx="10" fill="#1d4ed8"/>
+  <text x="60" y="270" class="box-title">FastAPI REST Endpoints</text>
+  <text x="60" y="287" class="box-sub">/projects · /sprints · /tasks · /orchestrator/run · /executive/summary · /agents/*</text>
+
+  <path d="M600,305 L600,330" class="arrow"/>
+
+  <!-- Orchestrator Layer -->
+  <text x="40" y="350" class="layer-label">ORCHESTRATION LAYER (LangGraph)</text>
+  <rect x="40" y="360" width="1120" height="60" rx="10" fill="#7c3aed"/>
+  <text x="60" y="385" class="box-title">State Machine Orchestrator</text>
+  <text x="60" y="402" class="box-sub">Shared ProjectState passed sequentially through all 7 nodes · agent_trace tracking</text>
+
+  <path d="M600,420 L600,445" class="arrow"/>
+
+  <!-- Agent Layer -->
+  <text x="40" y="465" class="layer-label">AGENT LAYER — 6 Specialized Agents + Automation</text>
+
+  <!-- Agent boxes -->
+  <g>
+    <rect x="40"  y="480" width="150" height="90" rx="10" fill="#2563eb"/>
+    <text x="55" y="505" class="box-title">Engineering</text>
+    <text x="55" y="522" class="box-sub">Progress %</text>
+    <text x="55" y="537" class="box-sub">Blocked detection</text>
+    <text x="55" y="552" class="box-sub">Inactivity flag</text>
+  </g>
+
+  <g>
+    <rect x="205" y="480" width="150" height="90" rx="10" fill="#4f46e5"/>
+    <text x="220" y="505" class="box-title">Risk</text>
+    <text x="220" y="522" class="box-sub">XGBoost models</text>
+    <text x="220" y="537" class="box-sub">Delay + burnout</text>
+    <text x="220" y="552" class="box-sub">Tuned, validated</text>
+  </g>
+
+  <g>
+    <rect x="370" y="480" width="150" height="90" rx="10" fill="#7c3aed"/>
+    <text x="385" y="505" class="box-title">Planning</text>
+    <text x="385" y="522" class="box-sub">Task ranking</text>
+    <text x="385" y="537" class="box-sub">Timeline forecast</text>
+    <text x="385" y="552" class="box-sub">Feasibility</text>
+  </g>
+
+  <g>
+    <rect x="535" y="480" width="150" height="90" rx="10" fill="#9333ea"/>
+    <text x="550" y="505" class="box-title">QA</text>
+    <text x="550" y="522" class="box-sub">PR urgency</text>
+    <text x="550" y="537" class="box-sub">score</text>
+    <text x="550" y="552" class="box-sub">Review queue</text>
+  </g>
+
+  <g>
+    <rect x="700" y="480" width="150" height="90" rx="10" fill="#c026d3"/>
+    <text x="715" y="505" class="box-title">Documentation</text>
+    <text x="715" y="522" class="box-sub">RAG (ChromaDB)</text>
+    <text x="715" y="537" class="box-sub">+ Gemini</text>
+    <text x="715" y="552" class="box-sub">Ask EngiPilot</text>
+  </g>
+
+  <g>
+    <rect x="865" y="480" width="150" height="90" rx="10" fill="#db2777"/>
+    <text x="880" y="505" class="box-title">Reporting</text>
+    <text x="880" y="522" class="box-sub">LLM summaries</text>
+    <text x="880" y="537" class="box-sub">Retrospective</text>
+    <text x="880" y="552" class="box-sub">generator</text>
+  </g>
+
+  <g>
+    <rect x="1030" y="480" width="130" height="90" rx="10" fill="#e11d48"/>
+    <text x="1045" y="505" class="box-title">Automation</text>
+    <text x="1045" y="522" class="box-sub">Slack alerts</text>
+    <text x="1045" y="537" class="box-sub">Event logging</text>
+  </g>
+
+  <path d="M600,570 L600,595" class="arrow"/>
+
+  <!-- Data Layer -->
+  <text x="40" y="618" class="layer-label">DATA &amp; EXTERNAL SERVICES</text>
+
+  <rect x="40" y="630" width="260" height="80" rx="10" fill="#0f766e"/>
+  <text x="55" y="655" class="box-title">PostgreSQL</text>
+  <text x="55" y="672" class="box-sub">Projects, Sprints, Tasks,</text>
+  <text x="55" y="687" class="box-sub">Team Members, Agent Logs</text>
+  <text x="55" y="702" class="box-sub">Schema via Alembic migrations</text>
+
+  <rect x="320" y="630" width="220" height="80" rx="10" fill="#0e7490"/>
+  <text x="335" y="655" class="box-title">Redis</text>
+  <text x="335" y="672" class="box-sub">Cache / session</text>
+  <text x="335" y="687" class="box-sub">state</text>
+
+  <rect x="560" y="630" width="240" height="80" rx="10" fill="#0369a1"/>
+  <text x="575" y="655" class="box-title">ChromaDB</text>
+  <text x="575" y="672" class="box-sub">Vector store for RAG</text>
+  <text x="575" y="687" class="box-sub">Sentence-Transformer embeddings</text>
+
+  <rect x="820" y="630" width="170" height="80" rx="10" fill="#334155"/>
+  <text x="835" y="655" class="box-title">GitHub API</text>
+  <text x="835" y="672" class="box-sub">Commits, PRs</text>
+  <text x="835" y="687" class="box-sub">per-project repo</text>
+
+  <rect x="1010" y="630" width="150" height="80" rx="10" fill="#7e22ce"/>
+  <text x="1025" y="655" class="box-title">Gemini API</text>
+  <text x="1025" y="672" class="box-sub">LLM generation</text>
+  <text x="1025" y="687" class="box-sub">w/ model fallback</text>
+
+  <!-- connecting lines from agents to data -->
+  <path d="M115,570 L170,630" class="arrow-dashed"/>
+  <path d="M280,570 L400,630" class="arrow-dashed"/>
+  <path d="M445,570 L440,630" class="arrow-dashed"/>
+  <path d="M610,570 L640,630" class="arrow-dashed"/>
+  <path d="M775,570 L680,630" class="arrow-dashed"/>
+  <path d="M775,570 L900,630" class="arrow-dashed"/>
+  <path d="M940,570 L1080,630" class="arrow-dashed"/>
+  <path d="M115,570 L900,630" class="arrow-dashed" opacity="0.4"/>
+
+  <!-- Legend -->
+  <rect x="40" y="740" width="1120" height="120" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="60" y="765" class="layer-label" fill="#0f172a">DEPLOYMENT</text>
+  <text x="60" y="790" class="subtitle">Docker Compose orchestrates PostgreSQL, Redis, and ChromaDB containers for local development.</text>
+  <text x="60" y="810" class="subtitle">FastAPI backend and Next.js frontend run as separate processes, communicating over REST with CORS enabled.</text>
+  <text x="60" y="830" class="subtitle">Each request to /orchestrator/run/{"{"}project_id{"}"} triggers the full 7-node agent chain, producing a</text>
+  <text x="60" y="850" class="subtitle">single JSON response consumed by all dashboard views — ensuring every view reflects the same, consistent agent output.</text>
+
+</svg>

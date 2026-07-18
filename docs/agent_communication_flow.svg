@@ -1,0 +1,141 @@
+<svg viewBox="0 0 1200 780" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: bold 24px 'Segoe UI', sans-serif; fill: #0f172a; }
+      .subtitle { font: 13px 'Segoe UI', sans-serif; fill: #64748b; }
+      .step-num { font: bold 14px 'Segoe UI', sans-serif; fill: #ffffff; }
+      .agent-title { font: bold 13px 'Segoe UI', sans-serif; fill: #ffffff; }
+      .flow-label { font: 11px 'Segoe UI', sans-serif; fill: #334155; }
+      .state-label { font: bold 10.5px 'Segoe UI', sans-serif; fill: #0f766e; }
+      .arrow { stroke: #64748b; stroke-width: 2; fill: none; marker-end: url(#arrow2); }
+    </style>
+    <marker id="arrow2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="780" fill="#f8fafc"/>
+
+  <text x="40" y="42" class="title">EngiPilot — Agent Communication Flow</text>
+  <text x="40" y="64" class="subtitle">How a single GET /orchestrator/run/{"{"}project_id{"}"} request flows through the 7-agent chain, updating shared state at each step</text>
+
+  <!-- Entry point -->
+  <circle cx="90" cy="130" r="26" fill="#0f172a"/>
+  <text x="90" y="135" text-anchor="middle" class="step-num">API</text>
+  <text x="40" y="175" class="flow-label" text-anchor="middle">Request</text>
+  <text x="20" y="190" class="flow-label" text-anchor="middle">arrives</text>
+
+  <path d="M116,130 L165,130" class="arrow"/>
+
+  <!-- Step 1: Engineering -->
+  <rect x="165" y="90" width="150" height="80" rx="10" fill="#2563eb"/>
+  <circle cx="180" cy="98" r="12" fill="#ffffff"/>
+  <text x="180" y="102" text-anchor="middle" font-size="11" font-weight="bold" fill="#2563eb">1</text>
+  <text x="195" y="122" class="agent-title">Engineering</text>
+  <text x="195" y="140" class="flow-label" fill="#dbeafe">Reads GitHub +</text>
+  <text x="195" y="155" class="flow-label" fill="#dbeafe">DB task data</text>
+
+  <text x="180" y="195" class="state-label">writes: engineering_data</text>
+
+  <path d="M315,130 L364,130" class="arrow"/>
+
+  <!-- Step 2: Risk -->
+  <rect x="365" y="90" width="150" height="80" rx="10" fill="#4f46e5"/>
+  <circle cx="380" cy="98" r="12" fill="#ffffff"/>
+  <text x="380" y="102" text-anchor="middle" font-size="11" font-weight="bold" fill="#4f46e5">2</text>
+  <text x="395" y="122" class="agent-title">Risk</text>
+  <text x="395" y="140" class="flow-label" fill="#e0e7ff">Reads task features,</text>
+  <text x="395" y="155" class="flow-label" fill="#e0e7ff">runs XGBoost</text>
+
+  <text x="380" y="195" class="state-label">writes: risk_data</text>
+
+  <path d="M515,130 L564,130" class="arrow"/>
+
+  <!-- Step 3: Planning -->
+  <rect x="565" y="90" width="150" height="80" rx="10" fill="#7c3aed"/>
+  <circle cx="580" cy="98" r="12" fill="#ffffff"/>
+  <text x="580" y="102" text-anchor="middle" font-size="11" font-weight="bold" fill="#7c3aed">3</text>
+  <text x="595" y="122" class="agent-title">Planning</text>
+  <text x="595" y="140" class="flow-label" fill="#ede9fe">Reads risk_data.</text>
+  <text x="595" y="155" class="flow-label" fill="#ede9fe">delay_risk ⟵ KEY LINK</text>
+
+  <text x="580" y="195" class="state-label">writes: planning_data</text>
+
+  <path d="M715,130 L764,130" class="arrow"/>
+
+  <!-- Step 4: QA -->
+  <rect x="765" y="90" width="130" height="80" rx="10" fill="#9333ea"/>
+  <circle cx="780" cy="98" r="12" fill="#ffffff"/>
+  <text x="780" y="102" text-anchor="middle" font-size="11" font-weight="bold" fill="#9333ea">4</text>
+  <text x="795" y="122" class="agent-title">QA</text>
+  <text x="795" y="140" class="flow-label" fill="#f3e8ff">Reads project's</text>
+  <text x="795" y="155" class="flow-label" fill="#f3e8ff">github_repo</text>
+
+  <text x="780" y="195" class="state-label">writes: qa_data</text>
+
+  <path d="M895,130 L944,130" class="arrow"/>
+
+  <!-- Step 5: Documentation -->
+  <rect x="945" y="90" width="150" height="80" rx="10" fill="#c026d3"/>
+  <circle cx="960" cy="98" r="12" fill="#ffffff"/>
+  <text x="960" y="102" text-anchor="middle" font-size="11" font-weight="bold" fill="#c026d3">5</text>
+  <text x="975" y="122" class="agent-title">Documentation</text>
+  <text x="975" y="140" class="flow-label" fill="#fae8ff">Queries ChromaDB,</text>
+  <text x="975" y="155" class="flow-label" fill="#fae8ff">calls Gemini</text>
+
+  <text x="960" y="195" class="state-label">writes: documentation_data</text>
+
+  <!-- Wrap to next row -->
+  <path d="M1020,170 L1020,230 L1020,250" class="arrow"/>
+
+  <!-- Step 6: Reporting -->
+  <rect x="775" y="250" width="150" height="80" rx="10" fill="#db2777"/>
+  <circle cx="790" cy="258" r="12" fill="#ffffff"/>
+  <text x="790" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="#db2777">6</text>
+  <text x="805" y="282" class="agent-title">Reporting</text>
+  <text x="805" y="300" class="flow-label" fill="#fce7f3">Reads ALL prior</text>
+  <text x="805" y="315" class="flow-label" fill="#fce7f3">agent outputs</text>
+
+  <text x="790" y="355" class="state-label">writes: report_output</text>
+
+  <path d="M775,290 L726,290" class="arrow"/>
+
+  <!-- Step 7: Automation -->
+  <rect x="565" y="250" width="150" height="80" rx="10" fill="#e11d48"/>
+  <circle cx="580" cy="258" r="12" fill="#ffffff"/>
+  <text x="580" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="#e11d48">7</text>
+  <text x="595" y="282" class="agent-title">Automation</text>
+  <text x="595" y="300" class="flow-label" fill="#fecdd3">Checks thresholds,</text>
+  <text x="595" y="315" class="flow-label" fill="#fecdd3">fires Slack + logs</text>
+
+  <text x="580" y="355" class="state-label">writes: automation_data</text>
+
+  <path d="M565,290 L516,290" class="arrow"/>
+
+  <!-- Final response -->
+  <circle cx="470" cy="290" r="30" fill="#0f172a"/>
+  <text x="470" y="285" text-anchor="middle" class="step-num" font-size="11">JSON</text>
+  <text x="470" y="298" text-anchor="middle" class="step-num" font-size="11">Response</text>
+
+  <text x="380" y="360" class="flow-label" text-anchor="middle" font-weight="bold">agent_trace:</text>
+  <text x="380" y="378" class="flow-label" text-anchor="middle" font-size="9.5">[engineering, risk, planning,</text>
+  <text x="380" y="392" class="flow-label" text-anchor="middle" font-size="9.5">qa, documentation, reporting,</text>
+  <text x="380" y="406" class="flow-label" text-anchor="middle" font-size="9.5">automation]</text>
+
+  <!-- Key insight box -->
+  <rect x="40" y="450" width="1120" height="150" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="60" y="480" font-weight="bold" font-size="15" fill="#0f172a">Key Design Point — Genuine Agent Collaboration, Not Isolated Calls</text>
+  <text x="60" y="510" class="subtitle">Every agent reads from and writes to a single shared `ProjectState` object as it moves through the LangGraph state machine.</text>
+  <text x="60" y="530" class="subtitle">The clearest example: the Planning Agent does not calculate its own risk — it reads `risk_data.delay_risk`, produced by the</text>
+  <text x="60" y="550" class="subtitle">Risk Agent one step earlier, and uses it to decide whether to recommend reducing sprint scope. Similarly, the Reporting Agent</text>
+  <text x="60" y="570" class="subtitle">and Automation Agent both consume the combined output of all five agents before them — meaning a change in the Risk Agent's</text>
+  <text x="60" y="590" class="subtitle">prediction ripples forward through Planning's recommendation, the final report's wording, and whether a Slack alert fires.</text>
+
+  <!-- Legend -->
+  <rect x="40" y="630" width="1120" height="110" rx="10" fill="#f1f5f9"/>
+  <text x="60" y="655" font-weight="bold" font-size="13" fill="#0f172a">Failure Handling</text>
+  <text x="60" y="678" class="subtitle">If any single agent throws an unhandled exception, the orchestrator run fails and the API returns an error — this is a documented</text>
+  <text x="60" y="696" class="subtitle">limitation (see README). Each agent internally catches expected failures (e.g. Gemini API errors) and returns a graceful fallback</text>
+  <text x="60" y="714" class="subtitle">response instead of raising, which is why the automation and reporting steps remain resilient to LLM quota/availability issues.</text>
+
+</svg>

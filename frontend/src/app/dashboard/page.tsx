@@ -18,6 +18,8 @@ import NewProjectModal from "@/components/NewProjectModal";
 import AddTaskModal from "@/components/AddTaskModal";
 import AddSprintModal from "@/components/AddSprintModal";
 import ExecutiveDashboard from "@/components/ExecutiveDashboard";
+import LoadingState from "@/components/LoadingState";
+import EmptyState from "@/components/EmptyState";
 
 interface SprintOption {
   id: number;
@@ -100,7 +102,14 @@ export default function Dashboard() {
           <ExecutiveDashboard />
         ) : (
           <>
-            {loading && <p className="text-slate-500">Loading agent data...</p>}
+            {loading && <LoadingState />}
+
+            {!loading && !data && projects.length === 0 && (
+              <EmptyState
+                message="No projects yet. Create your first project to get started."
+                action={<NewProjectModal onCreated={refreshProjects} />}
+              />
+            )}
 
             {data && !loading && (
               <AnimatePresence mode="wait">
