@@ -66,3 +66,8 @@ export const getProjectSprints = async (projectId: number) => {
   const res = await api.get(`/projects/${projectId}/sprints`);
   return res.data;
 };
+
+export const getExecutiveSummary = async () => {
+  const res = await api.get(`/executive/summary`);
+  return res.data;
+};
