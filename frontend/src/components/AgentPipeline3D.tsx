@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef, useMemo, useEffect } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Text, Line, Stars, Html } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
@@ -33,6 +33,28 @@ function nodeColor(index: number, total: number) {
   const c3 = new THREE.Color("#ec4899");
   const t = index / (total - 1);
   return t < 0.5 ? c1.clone().lerp(c2, t * 2) : c2.clone().lerp(c3, (t - 0.5) * 2);
+}
+
+// Adjusts camera distance based on the canvas's aspect ratio so the full
+// pipeline stays visible on narrow (mobile/portrait) screens, without
+// changing anything about how it looks on wider screens.
+function ResponsiveCamera() {
+  const { size, camera } = useThree();
+
+  useEffect(() => {
+    const aspect = size.width / size.height;
+    const baseZ = 6.5;
+    const idealAspect = 2.0;
+    const z = aspect < idealAspect ? baseZ * (idealAspect / aspect) : baseZ;
+
+    camera.position.set(0, 2.4, z);
+    camera.lookAt(0, 0, 0);
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.updateProjectionMatrix();
+    }
+  }, [size, camera]);
+
+  return null;
 }
 
 function FlowParticles({ start, end, color }: { start: [number, number, number]; end: [number, number, number]; color: string }) {
@@ -190,6 +212,7 @@ export default function AgentPipeline3D({ agentTrace }: { agentTrace: string[] }
         <p className="text-xs text-slate-500 uppercase tracking-wider">Live Agent Pipeline</p>
       </div>
       <Canvas camera={{ position: [0, 2.4, 6.5], fov: 42 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}>
+        <ResponsiveCamera />
         <ambientLight intensity={0.4} />
         <pointLight position={[3, 4, 5]} intensity={1} color="#3b82f6" />
         <pointLight position={[-3, 2, -3]} intensity={0.5} color="#ec4899" />
