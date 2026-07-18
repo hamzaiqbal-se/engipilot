@@ -194,3 +194,44 @@ def get_project_sprints(project_id: int):
         return [{"id": s.id, "sprint_number": s.sprint_number, "goal": s.goal} for s in sprints]
     finally:
         db.close()
+
+@app.get("/executive/summary")
+def executive_summary():
+    db = SessionLocal()
+    try:
+        projects = db.query(models.Project).all()
+        summary = []
+
+        for project in projects:
+            engineering_result = run_engineering_agent(project.id, db)
+            risk_result = run_risk_agent(project.id, db)
+
+            summary.append({
+                "project_id": project.id,
+                "project_name": project.name,
+                "technology": project.technology,
+                "progress_percentage": engineering_result.get("progress_percentage", 0),
+                "delay_risk": risk_result.get("delay_risk", 0),
+                "completion_forecast": risk_result.get("completion_forecast", "Unknown"),
+                "blocked_task_count": engineering_result.get("blocked_task_count", 0),
+            })
+
+        total_projects = len(summary)
+        at_risk_count = len([s for s in summary if s["completion_forecast"] == "At Risk"])
+        needs_attention_count = len([s for s in summary if s["completion_forecast"] == "Needs Attention"])
+        on_track_count = len([s for s in summary if s["completion_forecast"] == "On Track"])
+
+        avg_progress = round(sum(s["progress_percentage"] for s in summary) / total_projects, 1) if total_projects > 0 else 0
+        avg_delay_risk = round(sum(s["delay_risk"] for s in summary) / total_projects, 3) if total_projects > 0 else 0
+
+        return {
+            "total_projects": total_projects,
+            "at_risk_count": at_risk_count,
+            "needs_attention_count": needs_attention_count,
+            "on_track_count": on_track_count,
+            "avg_progress": avg_progress,
+            "avg_delay_risk": avg_delay_risk,
+            "projects": summary,
+        }
+    finally:
+        db.close()
