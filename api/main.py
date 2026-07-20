@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from api.database import engine, Base, get_db
@@ -21,8 +21,14 @@ from agents.risk_agent import run_risk_agent
 from agents.planning_agent import run_planning_agent
 from agents.qa_agent import run_qa_agent
 from agents.retrospective_agent import generate_sprint_retrospective
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 app = FastAPI(title="EngiPilot API", version="0.1.0")
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -80,7 +86,8 @@ def risk_agent_endpoint(project_id: int):
         db.close()
 
 @app.get("/orchestrator/run/{project_id}")
-def orchestrator_endpoint(project_id: int):
+@limiter.limit("10/minute")
+def orchestrator_endpoint(request: Request, project_id: int):
     db = SessionLocal()
     try:
         result = run_orchestrator(project_id, db)
@@ -116,11 +123,13 @@ def documentation_index_endpoint():
     return index_project_documents()
 
 @app.get("/agents/documentation/query")
-def documentation_query_endpoint(query: str):
+@limiter.limit("15/minute")
+def documentation_query_endpoint(request: Request, query: str):
     return run_documentation_agent(query)
 
 @app.get("/agents/reporting/{project_id}")
-def reporting_agent_endpoint(project_id: int):
+@limiter.limit("10/minute")
+def reporting_agent_endpoint(request: Request, project_id: int):
     db = SessionLocal()
     try:
         engineering_result = run_engineering_agent(project_id, db)
@@ -140,7 +149,8 @@ def reporting_agent_endpoint(project_id: int):
         db.close()
 
 @app.get("/agents/retrospective/{project_id}")
-def retrospective_endpoint(project_id: int):
+@limiter.limit("10/minute")
+def retrospective_endpoint(request: Request, project_id: int):
     db = SessionLocal()
     try:
         engineering_result = run_engineering_agent(project_id, db)
