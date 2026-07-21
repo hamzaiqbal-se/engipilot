@@ -5,17 +5,10 @@ from agents.reporting_agent import run_reporting_agent
 def test_reporting_agent_generates_report(monkeypatch):
     """Reporting Agent should synthesize a report from aggregated agent data."""
 
-    class FakeResponse:
-        text = "The project is 50% complete with one blocked task. Delay risk is moderate."
+    def fake_generate_text(prompt):
+        return "The project is 50% complete with one blocked task. Delay risk is moderate."
 
-    class FakeModel:
-        def generate_content(self, prompt):
-            return FakeResponse()
-
-    monkeypatch.setattr(
-        "agents.reporting_agent.genai.Client",
-        lambda api_key: type("FakeClient", (), {"models": type("M", (), {"generate_content": staticmethod(lambda model, contents: FakeResponse())})()})()
-    )
+    monkeypatch.setattr("agents.reporting_agent.generate_text", fake_generate_text)
 
     fake_state = {
         "project_id": 1,
@@ -28,15 +21,15 @@ def test_reporting_agent_generates_report(monkeypatch):
     result = run_reporting_agent(fake_state)
 
     assert result["project_id"] == 1
-    assert "50%" in result["report"] or "50" in result["report"]
+    assert "50" in result["report"]
     assert result["based_on"]["progress_percentage"] == 50
 
 
 def test_reporting_agent_handles_llm_failure(monkeypatch):
-    def fake_get_client_raises():
+    def fake_generate_text_raises(prompt):
         raise Exception("API unreachable")
 
-    monkeypatch.setattr("agents.reporting_agent._get_client", fake_get_client_raises)
+    monkeypatch.setattr("agents.reporting_agent.generate_text", fake_generate_text_raises)
 
     result = run_reporting_agent({"project_id": 1})
     assert "error" in result
